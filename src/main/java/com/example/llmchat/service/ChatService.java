@@ -22,13 +22,19 @@ public class ChatService {
     }
 
     public String sendUserMessage(String userText){
-        history.add(new MessageDTO("user",userText));
+        MessageDTO userMessage=new MessageDTO("user",userText);
+        history.add(userMessage);
 
-        String assistantResponse=ollamaClient.sendMessage(history);
+        try {
+            String assistantResponse = ollamaClient.sendMessage(history);
 
-        history.add(new MessageDTO("assistant",assistantResponse));
+            history.add(new MessageDTO("assistant", assistantResponse));
 
-        return assistantResponse;
+            return assistantResponse;
+        }catch (RuntimeException exception){
+            history.remove(history.size()-1);
+            throw exception;
+        }
     }
 
     public void resetChat(){
